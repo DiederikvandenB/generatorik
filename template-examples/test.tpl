@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { render } from 'utils/testing';
+import { render } from 'utils/setupTests';
 
 import {{.ComponentName}} from './{{.ComponentName}}';
 

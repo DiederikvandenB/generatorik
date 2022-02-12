@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 Diederik van den Burger
+Copyright © 2021 Diederik van den Burger <diederikvandenburger@tab.capital>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,26 +16,11 @@ limitations under the License.
 package cmd
 
 import (
-	"fmt"
-	"generatorik/templates"
-	"github.com/spf13/cobra"
-	"os"
-	"path"
-	"strings"
+  "generatorik/generate"
+  "github.com/spf13/cobra"
+  "path"
+  "strings"
 )
-
-func outputDir(flagValue string) string {
-	var output string
-	path, _ := os.Getwd()
-
-	if flagValue != "" {
-		output = flagValue
-	} else {
-		output = path
-	}
-
-	return output
-}
 
 // componentCmd represents the component command
 var componentCmd = &cobra.Command{
@@ -44,56 +29,42 @@ var componentCmd = &cobra.Command{
 	Args:  cobra.MaximumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		outputFlag, _ := cmd.Flags().GetString("directory")
-		outputDirectory := outputDir(outputFlag)
-
-		var componentName string
-		if len(args) == 0 {
-			path, _ := os.Getwd()
-			split := strings.Split(path, "/")
-			componentName = split[len(split)-1]
-		} else {
-			componentName = args[0]
-		}
-
-		_, err := os.Stat(outputDirectory)
-		if os.IsNotExist(err) {
-			fmt.Println("Error: output directory does not exist")
-			return
-		}
+		outputDirectory := generate.OutputDir(outputFlag)
+		componentName := generate.ComponentName(args, outputDirectory)
 
 		if noTest, _ := cmd.Flags().GetBool("no-test"); noTest == false {
-			templates.WriteTest(templates.TestProps{
+			generate.WriteTest(generate.TestProps{
 				ComponentName: componentName,
 			}, path.Join(outputDirectory, strings.ToLower(componentName)+".spec.tsx"))
 		}
 
 		if noStory, _ := cmd.Flags().GetBool("no-story"); noStory == false {
-			templates.WriteStory(templates.StoryProps{
+			generate.WriteStories(generate.StoriesProps{
 				ComponentName: componentName,
 			}, path.Join(outputDirectory, strings.ToLower(componentName)+".stories.mdx"))
 		}
 
 		noStyle, _ := cmd.Flags().GetBool("no-style")
 		if noStyle == false {
-			templates.WriteStyles(templates.StylesProps{
+			generate.WriteStyles(generate.StylesProps{
 				ComponentName: componentName,
 			}, path.Join(outputDirectory, strings.ToLower(componentName)+".styles.tsx"))
 		}
 
 		if noIndex, _ := cmd.Flags().GetBool("no-index"); noIndex == false {
-			templates.WriteIndex(templates.IndexProps{
+			generate.WriteIndex(generate.IndexProps{
 				ComponentName: componentName,
 			}, path.Join(outputDirectory, "index.ts"))
 		}
 
 		hasProps, _ := cmd.Flags().GetBool("has-props")
-		var componentProps = templates.ComponentProps{
+		var componentProps = generate.ComponentProps{
 			ComponentName: componentName,
 			HasProps:      hasProps,
 			HasStyles:     !noStyle,
 		}
 
-		templates.WriteComponent(
+		generate.WriteComponent(
 			componentProps,
 			path.Join(outputDirectory, componentName+".tsx"),
 		)

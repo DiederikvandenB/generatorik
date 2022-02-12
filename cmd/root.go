@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 Diederik van den Burger
+Copyright © 2021 Diederik van den Burger <diederikvandenburger@tab.capital>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import (
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:     "generatorik",
-	Short:   "Easily generator React component stubs",
+	Short:   "Easily generate React component stubs",
 	Version: "v0.0.1",
 
 	// Uncomment the following line if your bare application

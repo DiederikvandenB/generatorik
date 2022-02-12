@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 NAME HERE <EMAIL ADDRESS>
+Copyright © 2021 Diederik van den Burger <diederikvandenburger@tab.capital>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,29 +16,80 @@ limitations under the License.
 package cmd
 
 import (
-	"os"
+  "os"
 
-	"github.com/spf13/cobra"
+  "github.com/spf13/cobra"
 )
 
 // completionCmd represents the completion command
 var completionCmd = &cobra.Command{
-	Use:   "completion",
-	Run: func(cmd *cobra.Command, args []string) {
-		cmd.Root().GenZshCompletion(os.Stdout)
-	},
+  Use:                   "completion [bash|zsh|fish|powershell]",
+  Short:                 "Generate completion script",
+  Long: `To load completions:
+
+Bash:
+
+$ source <(generatorik completion bash)
+
+# To load completions for each session, execute once:
+Linux:
+  $ generatorik completion bash > /etc/bash_completion.d/generatorik
+MacOS:
+  $ generatorik completion bash > /usr/local/etc/bash_completion.d/generatorik
+
+Zsh:
+
+# If shell completion is not already enabled in your environment you will need
+# to enable it.  You can execute the following once:
+
+$ echo "autoload -U compinit; compinit" >> ~/.zshrc
+
+# To load completions for each session, execute once:
+$ generatorik completion zsh > "${fpath[1]}/_generatorik"
+
+# You will need to start a new shell for this setup to take effect.
+
+Fish:
+
+$ generatorik completion fish | source
+
+# To load completions for each session, execute once:
+$ generatorik completion fish > ~/.config/fish/completions/generatorik.fish
+
+Powershell:
+
+PS> generatorik completion powershell | Out-String | Invoke-Expression
+
+# To load completions for every new session, run:
+PS> generatorik completion powershell > generatorik.ps1
+# and source this file from your powershell profile.
+`,
+  Args:      cobra.ExactValidArgs(1),
+  ValidArgs: []string{"bash", "zsh", "fish", "powershell"},
+  Run: func(cmd *cobra.Command, args []string) {
+    switch args[0] {
+    case "bash":
+      cmd.Root().GenBashCompletion(os.Stdout)
+    case "zsh":
+      cmd.Root().GenZshCompletion(os.Stdout)
+    case "fish":
+      cmd.Root().GenFishCompletion(os.Stdout, true)
+    case "powershell":
+      cmd.Root().GenPowerShellCompletion(os.Stdout)
+    }
+  },
 }
 
 func init() {
-	rootCmd.AddCommand(completionCmd)
+  rootCmd.AddCommand(completionCmd)
 
-	// Here you will define your flags and configuration settings.
+  // Here you will define your flags and configuration settings.
 
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// completionCmd.PersistentFlags().String("foo", "", "A help for foo")
+  // Cobra supports Persistent Flags which will work for this command
+  // and all subcommands, e.g.:
+  // completionCmd.PersistentFlags().String("foo", "", "A help for foo")
 
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// completionCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+  // Cobra supports local flags which will only run when this command
+  // is called directly, e.g.:
+  // completionCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
